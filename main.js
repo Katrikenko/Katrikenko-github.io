@@ -317,7 +317,6 @@ function restartGame() {
   updateScoreBoard();
 
   generateTetromino(true);
-  generateTetromino(false);
 
   if (autoDrop) {
     clearInterval(autoDrop);
@@ -326,6 +325,8 @@ function restartGame() {
     moveTetrominoDown();
     draw();
   }, 1000);
+
+  generateTetromino(false);
 }
 
 function gameOver() {
@@ -339,6 +340,10 @@ function gameOver() {
 }
 
 function isGameRealOver() {
+  if (!isPaused || !isGameOver) {
+    return;
+  }
+
   if (!tetromino) {
     return;
   }
@@ -465,6 +470,14 @@ function drawNextTetromino() {
         cell.classList.add(name);
       }
     }
+  }
+
+  if (nextTetromino.canRotate) {
+    cellsNext.forEach((cell) => {
+      cell.addEventListener("click", function (event) {
+        event.stopPropagation(); // Зупинити подальше розповсюдження події
+      });
+    });
   }
 }
 
@@ -642,6 +655,7 @@ function rotateTetromino() {
   const oldMatrix = tetromino.matrix;
   const rotatedMatrix = rotateMatrix(tetromino.matrix);
   tetromino.matrix = rotatedMatrix;
+
   if (isValid()) {
     tetromino.matrix = oldMatrix;
   }
